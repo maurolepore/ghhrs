@@ -11,9 +11,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-# ghhrs
+# My work on r2dii packages
 
-Based on https://rpubs.com/hadley/gh.
+Adapted from https://rpubs.com/hadley/gh.
+
+On July 1, 2019 I started working on an ecosystem of R packages named "r2dii". Here I explore my work so far.
 
 ```{r}
 library(gh)
@@ -22,13 +24,15 @@ library(tibble)
 library(dplyr)
 library(readr)
 library(lubridate)
+library(ggplot2)
+library(forcats)
 ```
 
-I start by getting a list of the 100 repos that I’ve touched most recently:
+I start by getting a list of the 50 repos that I’ve touched most recently.
 
 ```{r}
 my_repos <- function(type = c("all", "owner", "public", "private", "member"), 
-                     limit = 100) {
+                     limit = 50) {
   type <- match.arg(type)
   
   gh(
@@ -38,12 +42,18 @@ my_repos <- function(type = c("all", "owner", "public", "private", "member"),
     .limit = limit
   )
 }
-repos <- my_repos("owner", limit = 100)
+repos <- my_repos("owner", limit = 50)
 length(repos)
 
 full_name <- repos %>% map_chr("full_name")
 head(full_name, 20)
+```
 
+(If you’re doing this yourself, you’ll need to make sure you’ve set up an environment variable GITHUB_PAT with a GitHub personal access token.)
+
+And then, for each repo, I get all the commits since 2019-07-01, around the time I became a full time software developer. I collaborate with other people, so I make sure to extract the author of the commit.
+
+```{r}
 repo_commits <- function(full_name, since = "2019-07-01") {
   message("Requesting commits for ", full_name)
   
@@ -68,14 +78,18 @@ commits <- full_name %>% map(repo_commits) %>% compact() %>% bind_rows()
 commits
 ```
 
+Next, I parse the commit date, and set my timezone. I break the datetime into separate date and time pieces as that will make plotting easier later on.
+
 ```{r}
 commits <- commits %>% mutate(
   datetime = lubridate::with_tz(readr::parse_datetime(datetime), "America/Chicago"),
   date = floor_date(datetime, "day"),
-  time = update(datetime, yday = 1)
+  time = update(datetime, yday = lubridate::yday("2019-08-01"))
 )
 commits
 ```
+
+Next, I do a couple of quick checks to make sure the data looks reasonable.
 
 ```{r}
 commits %>% count(full_name, sort = TRUE) %>% print(n = 20)
@@ -83,15 +97,11 @@ commits %>% count(full_name, sort = TRUE) %>% print(n = 20)
 commits %>% count(author, sort = TRUE)
 ```
 
-```{r}
-library(ggplot2)
-library(forcats)  # devtools::install_github("hadley/forcats")
-library(ggbeeswarm) # devtools::install_github("eclarke/ggbeeswarm")
-```
+Now I pull out just the commits that I made, and only for repositories matching "r2dii".
 
 ```{r}
 mauro <- commits %>% 
-  filter(author == "maurolepore")
+  filter(author == "maurolepore", grepl("r2dii", full_name))
 
 mauro
 ```
@@ -102,7 +112,7 @@ To start, lets figure out what I’ve been working on. I’ll just look at the t
 mauro %>% 
   mutate(repo = full_name %>% fct_reorder(date) %>% fct_rev() %>% fct_lump(25)) %>% 
   ggplot(aes(date, repo)) + 
-  geom_quasirandom(size = 0.5)
+  geom_jitter()
 ```
 
 What times of day do I usually work on things?
@@ -110,16 +120,15 @@ What times of day do I usually work on things?
 ```{r}
 mauro %>% 
   ggplot(aes(date, time)) + 
-  geom_quasirandom()
+  geom_jitter()
 ```
 
-Finally, we can look at my average work week by breaking down by day of week, and focussing on my usual working hours.
+Finally, we can look at my average work week by breaking down by day of week.
 
 ```{r}
 mauro %>% 
   mutate(wday = wday(date, label = TRUE) %>% fct_shift(1) %>% fct_rev()) %>% 
-  # filter(hour(time) >= 6, hour(time) <= 18) %>% 
   ggplot(aes(time, wday)) + 
-  geom_quasirandom() 
+  geom_jitter()
 ```
 

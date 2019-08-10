@@ -1,9 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ghhrs
+# My work on r2dii packages
 
-Based on <https://rpubs.com/hadley/gh>.
+Adapted from <https://rpubs.com/hadley/gh>.
+
+On July 1, 2019 I started working on an ecosystem of R packages named
+“r2dii”. Here I explore my work so far.
 
 ``` r
 library(gh)
@@ -25,11 +28,16 @@ library(lubridate)
 #> The following object is masked from 'package:base':
 #> 
 #>     date
+library(ggplot2)
+library(forcats)
 ```
+
+I start by getting a list of the 50 repos that I’ve touched most
+recently.
 
 ``` r
 my_repos <- function(type = c("all", "owner", "public", "private", "member"), 
-                     limit = 10) {
+                     limit = 50) {
   type <- match.arg(type)
   
   gh(
@@ -39,24 +47,44 @@ my_repos <- function(type = c("all", "owner", "public", "private", "member"),
     .limit = limit
   )
 }
-repos <- my_repos("owner", limit = 10)
+repos <- my_repos("owner", limit = 50)
 length(repos)
-#> [1] 10
+#> [1] 50
 
 full_name <- repos %>% map_chr("full_name")
 head(full_name, 20)
-#>  [1] "maurolepore/r2dii.dataprep"       
-#>  [2] "maurolepore/r2dii.dataraw"        
-#>  [3] "maurolepore/ghhrs"                
-#>  [4] "maurolepore/junr"                 
-#>  [5] "maurolepore/DCC"                  
-#>  [6] "maurolepore/drake"                
-#>  [7] "maurolepore/drake-manual"         
-#>  [8] "maurolepore/Reference"            
+#>  [1] "maurolepore/r2dii.data"           
+#>  [2] "maurolepore/r2dii.dataprep"       
+#>  [3] "maurolepore/r2dii.dataraw"        
+#>  [4] "maurolepore/ghhrs"                
+#>  [5] "maurolepore/junr"                 
+#>  [6] "maurolepore/DCC"                  
+#>  [7] "maurolepore/drake"                
+#>  [8] "maurolepore/drake-manual"         
 #>  [9] "maurolepore/covr"                 
 #> [10] "maurolepore/maurolepore.github.io"
+#> [11] "maurolepore/todo"                 
+#> [12] "maurolepore/r2dii.usethis"        
+#> [13] "maurolepore/meetings"             
+#> [14] "maurolepore/cv"                   
+#> [15] "maurolepore/flagr"                
+#> [16] "maurolepore/GitHistoryTracker"    
+#> [17] "maurolepore/ghactions"            
+#> [18] "maurolepore/github-demo"          
+#> [19] "maurolepore/compareWith"          
+#> [20] "maurolepore/praise"
+```
 
-repo_commits <- function(full_name, since = "2019-01-01") {
+(If you’re doing this yourself, you’ll need to make sure you’ve set up
+an environment variable GITHUB\_PAT with a GitHub personal access
+token.)
+
+And then, for each repo, I get all the commits since 2019-07-01, around
+the time I became a full time software developer. I collaborate with
+other people, so I make sure to extract the author of the commit.
+
+``` r
+repo_commits <- function(full_name, since = "2019-07-01") {
   message("Requesting commits for ", full_name)
   
   commits <- gh("GET /repos/:full_name/commits", 
@@ -77,6 +105,7 @@ repo_commits <- function(full_name, since = "2019-01-01") {
 }
 
 commits <- full_name %>% map(repo_commits) %>% compact() %>% bind_rows()
+#> Requesting commits for maurolepore/r2dii.data
 #> Requesting commits for maurolepore/r2dii.dataprep
 #> Requesting commits for maurolepore/r2dii.dataraw
 #> Requesting commits for maurolepore/ghhrs
@@ -84,109 +113,163 @@ commits <- full_name %>% map(repo_commits) %>% compact() %>% bind_rows()
 #> Requesting commits for maurolepore/DCC
 #> Requesting commits for maurolepore/drake
 #> Requesting commits for maurolepore/drake-manual
-#> Requesting commits for maurolepore/Reference
 #> Requesting commits for maurolepore/covr
 #> Requesting commits for maurolepore/maurolepore.github.io
+#> Requesting commits for maurolepore/todo
+#> Requesting commits for maurolepore/r2dii.usethis
+#> Requesting commits for maurolepore/meetings
+#> Requesting commits for maurolepore/cv
+#> Requesting commits for maurolepore/flagr
+#> Requesting commits for maurolepore/GitHistoryTracker
+#> Requesting commits for maurolepore/ghactions
+#> Requesting commits for maurolepore/github-demo
+#> Requesting commits for maurolepore/compareWith
+#> Requesting commits for maurolepore/praise
+#> Requesting commits for maurolepore/a-repo
+#> Requesting commits for maurolepore/rocker
+#> Requesting commits for maurolepore/meetups
+#> Requesting commits for maurolepore/gh4projects
+#> Requesting commits for maurolepore/what-they-forgot
+#> Requesting commits for maurolepore/confs
+#> Requesting commits for maurolepore/pkgdoc
+#> Requesting commits for maurolepore/fs
+#> Requesting commits for maurolepore/gitignore
+#> Requesting commits for maurolepore/fgeo.install
+#> Requesting commits for maurolepore/drat
+#> Requesting commits for maurolepore/tor
+#> Requesting commits for maurolepore/rodev
+#> Requesting commits for maurolepore/project
+#> Requesting commits for maurolepore/fgeo.krig
+#> Requesting commits for maurolepore/fgeo.misc
+#> Requesting commits for maurolepore/fgeo
+#> Requesting commits for maurolepore/dotfiles
+#> Requesting commits for maurolepore/temp.gh
+#> Requesting commits for maurolepore/fgeo.plot
+#> Requesting commits for maurolepore/git-comun
+#> Requesting commits for maurolepore/slack
+#> Requesting commits for maurolepore/testthat
+#> Requesting commits for maurolepore/commit
+#> Requesting commits for maurolepore/quienes-somos
+#> Requesting commits for maurolepore/un-repositorio
+#> Requesting commits for maurolepore/revdepcheck
+#> Requesting commits for maurolepore/gmailr
+#> Requesting commits for maurolepore/dev_guide
+#> Requesting commits for maurolepore/ixplorer
 commits
-#> # A tibble: 4,011 x 3
-#>    full_name                  author      datetime            
-#>    <chr>                      <chr>       <chr>               
-#>  1 maurolepore/r2dii.dataprep maurolepore 2019-08-10T00:03:35Z
-#>  2 maurolepore/r2dii.dataprep maurolepore 2019-08-09T23:49:37Z
-#>  3 maurolepore/r2dii.dataprep maurolepore 2019-08-09T23:43:52Z
-#>  4 maurolepore/r2dii.dataprep maurolepore 2019-08-09T22:34:35Z
-#>  5 maurolepore/r2dii.dataprep maurolepore 2019-08-09T22:12:39Z
-#>  6 maurolepore/r2dii.dataprep maurolepore 2019-08-09T20:33:47Z
-#>  7 maurolepore/r2dii.dataprep maurolepore 2019-08-09T20:26:50Z
-#>  8 maurolepore/r2dii.dataprep maurolepore 2019-08-09T20:26:38Z
-#>  9 maurolepore/r2dii.dataprep maurolepore 2019-08-09T20:13:27Z
-#> 10 maurolepore/r2dii.dataprep maurolepore 2019-08-09T18:23:10Z
-#> # ... with 4,001 more rows
+#> # A tibble: 1,225 x 3
+#>    full_name              author      datetime            
+#>    <chr>                  <chr>       <chr>               
+#>  1 maurolepore/r2dii.data maurolepore 2019-07-09T12:26:56Z
+#>  2 maurolepore/r2dii.data maurolepore 2019-07-09T09:43:11Z
+#>  3 maurolepore/r2dii.data maurolepore 2019-07-09T09:23:20Z
+#>  4 maurolepore/r2dii.data maurolepore 2019-07-09T09:18:51Z
+#>  5 maurolepore/r2dii.data maurolepore 2019-07-09T08:27:11Z
+#>  6 maurolepore/r2dii.data maurolepore 2019-07-09T08:27:23Z
+#>  7 maurolepore/r2dii.data maurolepore 2019-07-09T08:10:32Z
+#>  8 maurolepore/r2dii.data maurolepore 2019-07-09T08:26:37Z
+#>  9 maurolepore/r2dii.data maurolepore 2019-07-09T08:50:16Z
+#> 10 maurolepore/r2dii.data maurolepore 2019-07-09T08:23:20Z
+#> # ... with 1,215 more rows
 ```
+
+Next, I parse the commit date, and set my timezone. I break the datetime
+into separate date and time pieces as that will make plotting easier
+later on.
 
 ``` r
 commits <- commits %>% mutate(
   datetime = lubridate::with_tz(readr::parse_datetime(datetime), "America/Chicago"),
   date = floor_date(datetime, "day"),
-  time = update(datetime, yday = 1)
+  time = update(datetime, yday = lubridate::yday("2019-08-01"))
 )
 #> Warning in (function (object, years = integer(), months = integer(), days =
 #> integer(), : partial argument match of 'yday' to 'ydays'
 commits
-#> # A tibble: 4,011 x 5
+#> # A tibble: 1,225 x 5
 #>    full_name author datetime            date               
 #>    <chr>     <chr>  <dttm>              <dttm>             
-#>  1 maurolep~ mauro~ 2019-08-09 19:03:35 2019-08-09 00:00:00
-#>  2 maurolep~ mauro~ 2019-08-09 18:49:37 2019-08-09 00:00:00
-#>  3 maurolep~ mauro~ 2019-08-09 18:43:52 2019-08-09 00:00:00
-#>  4 maurolep~ mauro~ 2019-08-09 17:34:35 2019-08-09 00:00:00
-#>  5 maurolep~ mauro~ 2019-08-09 17:12:39 2019-08-09 00:00:00
-#>  6 maurolep~ mauro~ 2019-08-09 15:33:47 2019-08-09 00:00:00
-#>  7 maurolep~ mauro~ 2019-08-09 15:26:50 2019-08-09 00:00:00
-#>  8 maurolep~ mauro~ 2019-08-09 15:26:38 2019-08-09 00:00:00
-#>  9 maurolep~ mauro~ 2019-08-09 15:13:27 2019-08-09 00:00:00
-#> 10 maurolep~ mauro~ 2019-08-09 13:23:10 2019-08-09 00:00:00
-#> # ... with 4,001 more rows, and 1 more variable: time <dttm>
+#>  1 maurolep~ mauro~ 2019-07-09 07:26:56 2019-07-09 00:00:00
+#>  2 maurolep~ mauro~ 2019-07-09 04:43:11 2019-07-09 00:00:00
+#>  3 maurolep~ mauro~ 2019-07-09 04:23:20 2019-07-09 00:00:00
+#>  4 maurolep~ mauro~ 2019-07-09 04:18:51 2019-07-09 00:00:00
+#>  5 maurolep~ mauro~ 2019-07-09 03:27:11 2019-07-09 00:00:00
+#>  6 maurolep~ mauro~ 2019-07-09 03:27:23 2019-07-09 00:00:00
+#>  7 maurolep~ mauro~ 2019-07-09 03:10:32 2019-07-09 00:00:00
+#>  8 maurolep~ mauro~ 2019-07-09 03:26:37 2019-07-09 00:00:00
+#>  9 maurolep~ mauro~ 2019-07-09 03:50:16 2019-07-09 00:00:00
+#> 10 maurolep~ mauro~ 2019-07-09 03:23:20 2019-07-09 00:00:00
+#> # ... with 1,215 more rows, and 1 more variable: time <dttm>
 ```
+
+Next, I do a couple of quick checks to make sure the data looks
+reasonable.
 
 ``` r
 commits %>% count(full_name, sort = TRUE) %>% print(n = 20)
-#> # A tibble: 10 x 2
+#> # A tibble: 50 x 2
 #>    full_name                             n
 #>    <chr>                             <int>
-#>  1 maurolepore/drake                  1582
-#>  2 maurolepore/r2dii.dataraw          1021
-#>  3 maurolepore/Reference               984
-#>  4 maurolepore/drake-manual            245
-#>  5 maurolepore/maurolepore.github.io    71
-#>  6 maurolepore/DCC                      37
-#>  7 maurolepore/covr                     31
-#>  8 maurolepore/junr                     25
-#>  9 maurolepore/r2dii.dataprep           14
-#> 10 maurolepore/ghhrs                     1
+#>  1 maurolepore/r2dii.dataraw           661
+#>  2 maurolepore/drake                   263
+#>  3 maurolepore/ghactions                38
+#>  4 maurolepore/DCC                      33
+#>  5 maurolepore/drake-manual             31
+#>  6 maurolepore/github-demo              28
+#>  7 maurolepore/r2dii.usethis            25
+#>  8 maurolepore/covr                     23
+#>  9 maurolepore/junr                     20
+#> 10 maurolepore/r2dii.data               20
+#> 11 maurolepore/meetings                 17
+#> 12 maurolepore/r2dii.dataprep           14
+#> 13 maurolepore/maurolepore.github.io     5
+#> 14 maurolepore/todo                      5
+#> 15 maurolepore/compareWith               4
+#> 16 maurolepore/flagr                     3
+#> 17 maurolepore/cv                        2
+#> 18 maurolepore/a-repo                    1
+#> 19 maurolepore/commit                    1
+#> 20 maurolepore/confs                     1
+#> # ... with 30 more rows
 
 commits %>% count(author, sort = TRUE)
-#> # A tibble: 33 x 2
+#> # A tibble: 22 x 2
 #>    author            n
 #>    <chr>         <int>
-#>  1 maurolepore    1324
-#>  2 wlandau        1078
-#>  3 wlandau-lilly   626
-#>  4 2diiKlaus       278
-#>  5 Clare2D         278
-#>  6 blumoestit      196
-#>  7 bpbond           50
-#>  8 MilesMcBain      30
-#>  9 ronnyhdez        28
-#> 10 jimhester        25
-#> # ... with 23 more rows
+#>  1 maurolepore     767
+#>  2 wlandau-lilly   157
+#>  3 wlandau         130
+#>  4 maxheld83        38
+#>  5 ronnyhdez        27
+#>  6 <NA>             26
+#>  7 jimhester        21
+#>  8 2diiKlaus        17
+#>  9 Clare2D          16
+#> 10 ecamo19           5
+#> # ... with 12 more rows
 ```
 
-``` r
-library(ggplot2)
-library(forcats)  # devtools::install_github("hadley/forcats")
-library(ggbeeswarm) # devtools::install_github("eclarke/ggbeeswarm")
-```
+Now I pull out just the commits that I made, and only for repositories
+matching “r2dii”.
 
 ``` r
 mauro <- commits %>% 
-  filter(author == "maurolepore")
+  filter(author == "maurolepore", grepl("r2dii", full_name))
 
 mauro
-#> # A tibble: 1,324 x 5
+#> # A tibble: 685 x 5
 #>    full_name author datetime            date               
 #>    <chr>     <chr>  <dttm>              <dttm>             
-#>  1 maurolep~ mauro~ 2019-08-09 19:03:35 2019-08-09 00:00:00
-#>  2 maurolep~ mauro~ 2019-08-09 18:49:37 2019-08-09 00:00:00
-#>  3 maurolep~ mauro~ 2019-08-09 18:43:52 2019-08-09 00:00:00
-#>  4 maurolep~ mauro~ 2019-08-09 17:34:35 2019-08-09 00:00:00
-#>  5 maurolep~ mauro~ 2019-08-09 17:12:39 2019-08-09 00:00:00
-#>  6 maurolep~ mauro~ 2019-08-09 15:33:47 2019-08-09 00:00:00
-#>  7 maurolep~ mauro~ 2019-08-09 15:26:50 2019-08-09 00:00:00
-#>  8 maurolep~ mauro~ 2019-08-09 15:26:38 2019-08-09 00:00:00
-#>  9 maurolep~ mauro~ 2019-08-09 15:13:27 2019-08-09 00:00:00
-#> 10 maurolep~ mauro~ 2019-08-09 13:23:10 2019-08-09 00:00:00
-#> # ... with 1,314 more rows, and 1 more variable: time <dttm>
+#>  1 maurolep~ mauro~ 2019-07-09 07:26:56 2019-07-09 00:00:00
+#>  2 maurolep~ mauro~ 2019-07-09 04:43:11 2019-07-09 00:00:00
+#>  3 maurolep~ mauro~ 2019-07-09 04:23:20 2019-07-09 00:00:00
+#>  4 maurolep~ mauro~ 2019-07-09 04:18:51 2019-07-09 00:00:00
+#>  5 maurolep~ mauro~ 2019-07-09 03:27:11 2019-07-09 00:00:00
+#>  6 maurolep~ mauro~ 2019-07-09 03:27:23 2019-07-09 00:00:00
+#>  7 maurolep~ mauro~ 2019-07-09 03:10:32 2019-07-09 00:00:00
+#>  8 maurolep~ mauro~ 2019-07-09 03:26:37 2019-07-09 00:00:00
+#>  9 maurolep~ mauro~ 2019-07-09 03:50:16 2019-07-09 00:00:00
+#> 10 maurolep~ mauro~ 2019-07-09 03:23:20 2019-07-09 00:00:00
+#> # ... with 675 more rows, and 1 more variable: time <dttm>
 ```
 
 To start, lets figure out what I’ve been working on. I’ll just look at
@@ -196,14 +279,9 @@ the top 25 repos.
 mauro %>% 
   mutate(repo = full_name %>% fct_reorder(date) %>% fct_rev() %>% fct_lump(25)) %>% 
   ggplot(aes(date, repo)) + 
-  geom_quasirandom(size = 0.5)
+  geom_jitter()
 #> Warning in rank(-count, ties = ties.method): partial argument match of
 #> 'ties' to 'ties.method'
-#> Warning in f(...): The default behavior of beeswarm has changed in version
-#> 0.6.0. In versions <0.6.0, this plot would have been dodged on the y-
-#> axis. In versions >=0.6.0, groupOnX=FALSE must be explicitly set to group
-#> on y-axis. Please set groupOnX=TRUE/FALSE to avoid this warning and ensure
-#> proper axis choice.
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
@@ -213,25 +291,19 @@ What times of day do I usually work on things?
 ``` r
 mauro %>% 
   ggplot(aes(date, time)) + 
-  geom_quasirandom()
+  geom_jitter()
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 Finally, we can look at my average work week by breaking down by day of
-week, and focussing on my usual working hours.
+week.
 
 ``` r
 mauro %>% 
   mutate(wday = wday(date, label = TRUE) %>% fct_shift(1) %>% fct_rev()) %>% 
-  # filter(hour(time) >= 6, hour(time) <= 18) %>% 
   ggplot(aes(time, wday)) + 
-  geom_quasirandom() 
-#> Warning in f(...): The default behavior of beeswarm has changed in version
-#> 0.6.0. In versions <0.6.0, this plot would have been dodged on the y-
-#> axis. In versions >=0.6.0, groupOnX=FALSE must be explicitly set to group
-#> on y-axis. Please set groupOnX=TRUE/FALSE to avoid this warning and ensure
-#> proper axis choice.
+  geom_jitter()
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
