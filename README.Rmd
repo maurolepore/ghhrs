@@ -1,0 +1,72 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# ghhrs
+
+Based on https://rpubs.com/hadley/gh.
+
+```{r}
+library(gh)
+library(purrr)
+library(tibble)
+library(dplyr)
+library(readr)
+library(lubridate)
+```
+
+
+```{r}
+my_repos <- function(type = c("all", "owner", "public", "private", "member"), 
+                     limit = 100) {
+  type <- match.arg(type)
+  
+  gh(
+    "GET /user/repos",
+    type = type, 
+    sort = "updated",
+    .limit = limit
+  )
+}
+repos <- my_repos("owner", limit = 10)
+length(repos)
+
+full_name <- repos %>% map_chr("full_name")
+tail(full_name, 20)
+```
+
+```{r}
+repo_commits <- function(full_name, since = "2019-01-01") {
+  message("Requesting commits for ", full_name)
+  
+  commits <- gh("GET /repos/:full_name/commits", 
+    full_name = full_name, 
+    since = since,
+    .limit = Inf
+  )
+  
+  if (length(commits) == 0) {
+    return(NULL)
+  }
+  
+  tibble(
+    full_name = full_name,
+    author = commits %>% map_chr(c("author", "login"), .null = NA_character_),
+    datetime = commits %>% map_chr(c("commit", "author", "date"), .null = NA_character_)
+  )
+}
+
+commits <- full_name %>% map(repo_commits) %>% compact() %>% bind_rows()
+commits
+```
+
+
