@@ -24,6 +24,7 @@ library(readr)
 library(lubridate)
 ```
 
+I start by getting a list of the 100 repos that I’ve touched most recently:
 
 ```{r}
 my_repos <- function(type = c("all", "owner", "public", "private", "member"), 
@@ -37,15 +38,13 @@ my_repos <- function(type = c("all", "owner", "public", "private", "member"),
     .limit = limit
   )
 }
-repos <- my_repos("owner", limit = 10)
+repos <- my_repos("owner", limit = 100)
 length(repos)
 
 full_name <- repos %>% map_chr("full_name")
-tail(full_name, 20)
-```
+head(full_name, 20)
 
-```{r}
-repo_commits <- function(full_name, since = "2019-01-01") {
+repo_commits <- function(full_name, since = "2019-07-01") {
   message("Requesting commits for ", full_name)
   
   commits <- gh("GET /repos/:full_name/commits", 
@@ -69,4 +68,58 @@ commits <- full_name %>% map(repo_commits) %>% compact() %>% bind_rows()
 commits
 ```
 
+```{r}
+commits <- commits %>% mutate(
+  datetime = lubridate::with_tz(readr::parse_datetime(datetime), "America/Chicago"),
+  date = floor_date(datetime, "day"),
+  time = update(datetime, yday = 1)
+)
+commits
+```
+
+```{r}
+commits %>% count(full_name, sort = TRUE) %>% print(n = 20)
+
+commits %>% count(author, sort = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(forcats)  # devtools::install_github("hadley/forcats")
+library(ggbeeswarm) # devtools::install_github("eclarke/ggbeeswarm")
+```
+
+```{r}
+mauro <- commits %>% 
+  filter(author == "maurolepore")
+
+mauro
+```
+
+To start, lets figure out what I’ve been working on. I’ll just look at the top 25 repos.
+
+```{r}
+mauro %>% 
+  mutate(repo = full_name %>% fct_reorder(date) %>% fct_rev() %>% fct_lump(25)) %>% 
+  ggplot(aes(date, repo)) + 
+  geom_quasirandom(size = 0.5)
+```
+
+What times of day do I usually work on things?
+
+```{r}
+mauro %>% 
+  ggplot(aes(date, time)) + 
+  geom_quasirandom()
+```
+
+Finally, we can look at my average work week by breaking down by day of week, and focussing on my usual working hours.
+
+```{r}
+mauro %>% 
+  mutate(wday = wday(date, label = TRUE) %>% fct_shift(1) %>% fct_rev()) %>% 
+  # filter(hour(time) >= 6, hour(time) <= 18) %>% 
+  ggplot(aes(time, wday)) + 
+  geom_quasirandom() 
+```
 
