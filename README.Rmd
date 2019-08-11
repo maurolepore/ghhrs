@@ -127,12 +127,28 @@ mauro %>%
   geom_jitter()
 ```
 
-Finally, we can look at my average work week by breaking down by day of week.
+We can look at my average work week by breaking down by day of week.
 
 ```{r}
 mauro %>% 
   mutate(wday = wday(date, label = TRUE) %>% fct_shift(1) %>% fct_rev()) %>% 
   ggplot(aes(time, wday)) + 
   geom_jitter()
+```
+
+Finally we can estimate how much time I have spent working on each project.
+
+```{r}
+mauro %>% 
+  group_by(date, full_name) %>% 
+  arrange(datetime, full_name) %>% 
+  mutate(time_spent = last(time) - first(time)) %>% 
+  select(full_name, date, time_spent) %>% 
+  unique() %>% 
+  ungroup() %>% 
+  group_by(full_name) %>% 
+  summarize(total_time_spent = sum(time_spent, na.rm = TRUE)) %>% 
+  arrange(desc(total_time_spent)) %>% 
+  mutate(total_time_spent = seconds_to_period(total_time_spent))
 ```
 
