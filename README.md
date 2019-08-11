@@ -162,20 +162,20 @@ commits <- full_name %>% map(repo_commits) %>% compact() %>% bind_rows()
 #> Requesting commits for maurolepore/dev_guide
 #> Requesting commits for maurolepore/ixplorer
 commits
-#> # A tibble: 1,228 x 3
+#> # A tibble: 1,229 x 3
 #>    full_name              author      datetime            
 #>    <chr>                  <chr>       <chr>               
-#>  1 maurolepore/ghhrs      maurolepore 2019-08-10T23:32:58Z
-#>  2 maurolepore/ghhrs      maurolepore 2019-08-10T23:01:10Z
-#>  3 maurolepore/ghhrs      maurolepore 2019-08-10T21:59:43Z
-#>  4 maurolepore/ghhrs      maurolepore 2019-08-10T21:30:37Z
-#>  5 maurolepore/r2dii.data maurolepore 2019-07-09T12:26:56Z
-#>  6 maurolepore/r2dii.data maurolepore 2019-07-09T09:43:11Z
-#>  7 maurolepore/r2dii.data maurolepore 2019-07-09T09:23:20Z
-#>  8 maurolepore/r2dii.data maurolepore 2019-07-09T09:18:51Z
-#>  9 maurolepore/r2dii.data maurolepore 2019-07-09T08:27:11Z
-#> 10 maurolepore/r2dii.data maurolepore 2019-07-09T08:27:23Z
-#> # ... with 1,218 more rows
+#>  1 maurolepore/ghhrs      maurolepore 2019-08-11T00:27:36Z
+#>  2 maurolepore/ghhrs      maurolepore 2019-08-10T23:32:58Z
+#>  3 maurolepore/ghhrs      maurolepore 2019-08-10T23:01:10Z
+#>  4 maurolepore/ghhrs      maurolepore 2019-08-10T21:59:43Z
+#>  5 maurolepore/ghhrs      maurolepore 2019-08-10T21:30:37Z
+#>  6 maurolepore/r2dii.data maurolepore 2019-07-09T12:26:56Z
+#>  7 maurolepore/r2dii.data maurolepore 2019-07-09T09:43:11Z
+#>  8 maurolepore/r2dii.data maurolepore 2019-07-09T09:23:20Z
+#>  9 maurolepore/r2dii.data maurolepore 2019-07-09T09:18:51Z
+#> 10 maurolepore/r2dii.data maurolepore 2019-07-09T08:27:11Z
+#> # ... with 1,219 more rows
 ```
 
 Next, I parse the commit date, and set my timezone. I break the datetime into separate date and time pieces as that will make plotting easier later on.
@@ -190,20 +190,20 @@ commits <- commits %>% mutate(
 #> Warning in (function (object, years = integer(), months = integer(), days =
 #> integer(), : partial argument match of 'yday' to 'ydays'
 commits
-#> # A tibble: 1,228 x 5
+#> # A tibble: 1,229 x 5
 #>    full_name author datetime            date               
 #>    <chr>     <chr>  <dttm>              <dttm>             
-#>  1 maurolep~ mauro~ 2019-08-10 18:32:58 2019-08-10 00:00:00
-#>  2 maurolep~ mauro~ 2019-08-10 18:01:10 2019-08-10 00:00:00
-#>  3 maurolep~ mauro~ 2019-08-10 16:59:43 2019-08-10 00:00:00
-#>  4 maurolep~ mauro~ 2019-08-10 16:30:37 2019-08-10 00:00:00
-#>  5 maurolep~ mauro~ 2019-07-09 07:26:56 2019-07-09 00:00:00
-#>  6 maurolep~ mauro~ 2019-07-09 04:43:11 2019-07-09 00:00:00
-#>  7 maurolep~ mauro~ 2019-07-09 04:23:20 2019-07-09 00:00:00
-#>  8 maurolep~ mauro~ 2019-07-09 04:18:51 2019-07-09 00:00:00
-#>  9 maurolep~ mauro~ 2019-07-09 03:27:11 2019-07-09 00:00:00
-#> 10 maurolep~ mauro~ 2019-07-09 03:27:23 2019-07-09 00:00:00
-#> # ... with 1,218 more rows, and 1 more variable: time <dttm>
+#>  1 maurolep~ mauro~ 2019-08-10 19:27:36 2019-08-10 00:00:00
+#>  2 maurolep~ mauro~ 2019-08-10 18:32:58 2019-08-10 00:00:00
+#>  3 maurolep~ mauro~ 2019-08-10 18:01:10 2019-08-10 00:00:00
+#>  4 maurolep~ mauro~ 2019-08-10 16:59:43 2019-08-10 00:00:00
+#>  5 maurolep~ mauro~ 2019-08-10 16:30:37 2019-08-10 00:00:00
+#>  6 maurolep~ mauro~ 2019-07-09 07:26:56 2019-07-09 00:00:00
+#>  7 maurolep~ mauro~ 2019-07-09 04:43:11 2019-07-09 00:00:00
+#>  8 maurolep~ mauro~ 2019-07-09 04:23:20 2019-07-09 00:00:00
+#>  9 maurolep~ mauro~ 2019-07-09 04:18:51 2019-07-09 00:00:00
+#> 10 maurolep~ mauro~ 2019-07-09 03:27:11 2019-07-09 00:00:00
+#> # ... with 1,219 more rows, and 1 more variable: time <dttm>
 ```
 
 Next, I do a couple of quick checks to make sure the data looks reasonable.
@@ -226,10 +226,10 @@ commits %>% count(full_name, sort = TRUE) %>% print(n = 20)
 #> 10 maurolepore/r2dii.data               20
 #> 11 maurolepore/meetings                 17
 #> 12 maurolepore/r2dii.dataprep           14
-#> 13 maurolepore/maurolepore.github.io     5
-#> 14 maurolepore/todo                      5
-#> 15 maurolepore/compareWith               4
-#> 16 maurolepore/ghhrs                     4
+#> 13 maurolepore/ghhrs                     5
+#> 14 maurolepore/maurolepore.github.io     5
+#> 15 maurolepore/todo                      5
+#> 16 maurolepore/compareWith               4
 #> 17 maurolepore/flagr                     3
 #> 18 maurolepore/cv                        2
 #> 19 maurolepore/a-repo                    1
@@ -240,7 +240,7 @@ commits %>% count(author, sort = TRUE)
 #> # A tibble: 22 x 2
 #>    author            n
 #>    <chr>         <int>
-#>  1 maurolepore     770
+#>  1 maurolepore     771
 #>  2 wlandau-lilly   157
 #>  3 wlandau         130
 #>  4 maxheld83        38
@@ -314,11 +314,11 @@ mauro %>%
 
 ![](README_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
-Finally we can estimate how much time I have spent working on each project.
+How much time have I spent working on each project?
 
 
 ```r
-mauro %>% 
+hours_spent <- mauro %>% 
   group_by(date, full_name) %>% 
   arrange(datetime, full_name) %>% 
   mutate(time_spent = last(time) - first(time)) %>% 
@@ -326,15 +326,43 @@ mauro %>%
   unique() %>% 
   ungroup() %>% 
   group_by(full_name) %>% 
-  summarize(total_time_spent = sum(time_spent, na.rm = TRUE)) %>% 
-  arrange(desc(total_time_spent)) %>% 
-  mutate(total_time_spent = seconds_to_period(total_time_spent))
+  summarize(hours_spent = sum(time_spent, na.rm = TRUE)) %>% 
+  arrange(desc(hours_spent)) %>% 
+  mutate(
+    hours_spent = as.double(hours_spent) / 3600,
+    # Rest lunch (~1 hour every 8 hours)
+    hours_spent = hours_spent - (hours_spent %/% 8)
+  )
+hours_spent
 #> # A tibble: 4 x 2
-#>   full_name                  total_time_spent
-#>   <chr>                      <Period>        
-#> 1 maurolepore/r2dii.dataraw  8d 7H 26M 0S    
-#> 2 maurolepore/r2dii.usethis  12H 58M 15S     
-#> 3 maurolepore/r2dii.dataprep 9H 5M 15S       
-#> 4 maurolepore/r2dii.data     5H 30M 27S
+#>   full_name                  hours_spent
+#>   <chr>                            <dbl>
+#> 1 maurolepore/r2dii.dataraw       175.  
+#> 2 maurolepore/r2dii.usethis        12.0 
+#> 3 maurolepore/r2dii.dataprep        8.09
+#> 4 maurolepore/r2dii.data            5.51
 ```
+
+How many expected work hours have I accumulated so far?
+
+
+```r
+days <- as.double(today() - date("2019-07-01"))
+weekend_days <- (days %/% 7) * 2
+work_days <- days - weekend_days
+work_hours <- work_days * 8
+work_hours
+#> [1] 240
+```
+
+What percent of my time goes to r2dii packages?
+
+
+```r
+work_on_r2dii <- sum(hours_spent$hours_spent)
+percen_work_on_r2dii <- work_on_r2dii / work_hours * 100
+percen_work_on_r2dii
+#> [1] 83.74965
+```
+
 

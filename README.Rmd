@@ -136,10 +136,10 @@ mauro %>%
   geom_jitter()
 ```
 
-Finally we can estimate how much time I have spent working on each project.
+How much time have I spent working on each project?
 
 ```{r}
-mauro %>% 
+hours_spent <- mauro %>% 
   group_by(date, full_name) %>% 
   arrange(datetime, full_name) %>% 
   mutate(time_spent = last(time) - first(time)) %>% 
@@ -147,8 +147,32 @@ mauro %>%
   unique() %>% 
   ungroup() %>% 
   group_by(full_name) %>% 
-  summarize(total_time_spent = sum(time_spent, na.rm = TRUE)) %>% 
-  arrange(desc(total_time_spent)) %>% 
-  mutate(total_time_spent = seconds_to_period(total_time_spent))
+  summarize(hours_spent = sum(time_spent, na.rm = TRUE)) %>% 
+  arrange(desc(hours_spent)) %>% 
+  mutate(
+    hours_spent = as.double(hours_spent) / 3600,
+    # Rest lunch (~1 hour every 8 hours)
+    hours_spent = hours_spent - (hours_spent %/% 8)
+  )
+hours_spent
 ```
+
+How many expected work hours have I accumulated so far?
+
+```{r}
+days <- as.double(today() - date("2019-07-01"))
+weekend_days <- (days %/% 7) * 2
+work_days <- days - weekend_days
+work_hours <- work_days * 8
+work_hours
+```
+
+What percent of my time goes to r2dii packages?
+
+```{r}
+work_on_r2dii <- sum(hours_spent$hours_spent)
+percen_work_on_r2dii <- work_on_r2dii / work_hours * 100
+percen_work_on_r2dii
+```
+
 
